@@ -248,6 +248,7 @@ export class PixiPinLogin extends React.Component {
                 btn.y = rowIndex * (buttonHeight + buttonSpacing);
                 btn.interactive = true;
                 btn.buttonMode = true;
+             
                 btn.on("pointerdown", () => this.handlePinInput(digit));
                 container.addChild(btn);
                 buttons[digit] = btn;
