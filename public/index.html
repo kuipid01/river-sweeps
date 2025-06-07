@@ -15,8 +15,8 @@
     <meta name="full-screen" content="yes">
     <meta name="x5-fullscreen" content="true">
     <meta name="360-fullscreen" content="true">
-    <meta name="screen-orientation" content="">
-    <meta name="x5-orientation" content="">
+    <meta name="screen-orientation" content="landscape">
+    <meta name="x5-orientation" content="landscape">
     <meta name="x5-page-mode" content="app">
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Web site created using create-react-app" />
@@ -60,6 +60,9 @@
       }
       @media only screen and (max-device-width: 768px) {
         @media (orientation: portrait) {
+          #root {
+            display: none; /* Hide canvas in portrait if orientation lock fails */
+          }
           body::before {
             content: "Please rotate your device to landscape mode.";
             position: fixed;
@@ -80,6 +83,41 @@
         }
       }
     </style>
+    <script>
+      // Lock screen to landscape on mobile devices
+      window.addEventListener('load', () => {
+        // Check if device is mobile (max-device-width: 768px)
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          // Attempt to lock orientation to landscape
+          screen.orientation.lock('landscape').then(() => {
+            console.log('Orientation locked to landscape');
+          }).catch((err) => {
+            console.error('Failed to lock orientation:', err);
+            // Fallback: Fullscreen mode may help on some devices
+            if (jQuery.fn.fullscreen) {
+              jQuery('body').fullscreen();
+            }
+          });
+        } else if (isMobile) {
+          // Fallback for browsers without orientation lock
+          console.warn('Screen orientation lock not supported');
+          if (jQuery.fn.fullscreen) {
+            jQuery('body').fullscreen();
+          }
+        }
+      });
+
+      // Re-apply lock on orientation change
+      window.addEventListener('orientationchange', () => {
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch((err) => {
+            console.error('Failed to re-lock orientation:', err);
+          });
+        }
+      });
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
