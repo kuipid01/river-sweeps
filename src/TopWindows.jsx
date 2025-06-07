@@ -14,6 +14,7 @@ import { DailyWheelWin } from "./windows/DailyWheel";
 import { CreditedWin } from "./windows/BonusCredited";
 import { NewsWin } from "./windows/NewsWin";
 import {PixiPinLogin} from "./windows/nelogin";
+import PixiPinLoginFnc from "./windows/functional-comp-login";
 
 let PAGE_LOGIN = "PAGE_LOGIN";
 let PAGE_REG = "PAGE_REG";
@@ -108,8 +109,11 @@ class TopWindows extends React.Component {
                     <LoginWin onClose={this.onCloseAll} />
                 )} */}
                 {this.state.CURRENT_PAGE === PAGE_LOGIN && (
-                    <PixiPinLogin onClose={this.onCloseAll} />
+                    <PixiPinLoginFnc onClose={this.onCloseAll} />
                 )}
+                {/* {this.state.CURRENT_PAGE === PAGE_LOGIN && (
+                    <PixiPinLogin onClose={this.onCloseAll} />
+                )} */}
                 {this.state.CURRENT_PAGE === PAGE_MAINTEN && <MaintenenceWin />}
                 {this.state.CURRENT_PAGE === PAGE_FREE_PLAY && (
                     <FreePlayWin onClose={this.onCloseAll} />
