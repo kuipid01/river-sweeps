@@ -1,6 +1,5 @@
 import React from "react";
 import { EE } from "./App";
-import { LoginWin } from "./windows/LoginWin";
 import { RegWin } from "./windows/RegWin";
 import { FreePlayWin } from "./windows/FreePlayWin";
 import { SignPhoneWin } from "./windows/SignPhoneWin";
@@ -14,7 +13,6 @@ import { DailyWheelWin } from "./windows/DailyWheel";
 import { CreditedWin } from "./windows/BonusCredited";
 import { NewsWin } from "./windows/NewsWin";
 import {PixiPinLogin} from "./windows/nelogin";
-import PixiPinLoginFnc from "./windows/functional-comp-login";
 
 let PAGE_LOGIN = "PAGE_LOGIN";
 let PAGE_REG = "PAGE_REG";
@@ -108,12 +106,12 @@ class TopWindows extends React.Component {
                 {/* {this.state.CURRENT_PAGE === PAGE_LOGIN && (
                     <LoginWin onClose={this.onCloseAll} />
                 )} */}
-                {this.state.CURRENT_PAGE === PAGE_LOGIN && (
-                    <PixiPinLoginFnc onClose={this.onCloseAll} />
-                )}
                 {/* {this.state.CURRENT_PAGE === PAGE_LOGIN && (
-                    <PixiPinLogin onClose={this.onCloseAll} />
+                    <PixiPinLoginFnc onClose={this.onCloseAll} />
                 )} */}
+                {this.state.CURRENT_PAGE === PAGE_LOGIN && (
+                    <PixiPinLogin onClose={this.onCloseAll} />
+                )} 
                 {this.state.CURRENT_PAGE === PAGE_MAINTEN && <MaintenenceWin />}
                 {this.state.CURRENT_PAGE === PAGE_FREE_PLAY && (
                     <FreePlayWin onClose={this.onCloseAll} />

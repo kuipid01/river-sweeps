@@ -377,12 +377,14 @@ export class PixiPinLogin extends React.Component {
     };
 
     handlePinInput = (digit) => {
+        console.log("clicked  popped")
         if (digit === "C") {
             this.setState({ pinValue: "" }, this.refreshPinDisplay);
         } else if (digit === "OK") {
             console.log("PIN submitted:", this.state.pinValue);
             EE.emit("GO_GAME");
         } else {
+            console.log("clicked")
             this.setState(
                 (prev) => ({
                     pinValue:
