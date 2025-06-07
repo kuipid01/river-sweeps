@@ -92,17 +92,36 @@
     align-items: center;
     transition: 1s;
     z-index: 1000;
+  
 }
+.bg-load {
+    display: flex;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    transition: 1s;
+    z-index: 0;
+  object-position: center;
+  background-position: center;
+  object-fit: cover;
+}
+
 .prel-logo {
     width: auto;
     height: 40vh;
     max-width: 100vw;
     user-select: none;
+      z-index: 1000;
 }
 .prel-logo-img {
     object-fit: contain;
     width: 100%;
     height: 100%;
+    z-index: 1000;
 }
 
 .prel-bar {

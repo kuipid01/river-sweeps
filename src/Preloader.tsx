@@ -11,6 +11,11 @@ function Preloader() {
                     alt=""
                 />
             </div>
+            <img
+                src="http://localhost:3000/images/frenzy/login/bg2.png"
+                className="bg-load"
+                alt=""
+            />
             <div className="prel-bar">
                 <div className="prel-bar-line">
                     <img
