@@ -1,6 +1,6 @@
 import React from "react";
 import * as PIXI from "pixi.js";
-import { Application, Text, TextStyle, Graphics, Container } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { EE } from "../App";
 import { PAGE_SIZE_DEFAULT } from "../common/Config";
 
@@ -27,6 +27,9 @@ export class PixiPinLogin extends React.Component {
         this.pixiRef = React.createRef();
         this.app = null;
         this.stage = null;
+          this.bgSprite = null; // <-- store background sprite
+        this.resources = null;
+      
         this.state = {
             rememberMe: false,
             layoutName: "default",
@@ -47,16 +50,35 @@ export class PixiPinLogin extends React.Component {
         this.stage = new Container();
         this.app.stage.addChild(this.stage);
 
-        loadAssets(assets)
+     
+
+          loadAssets(assets)
             .then((resources) => {
-                const bgSprite = new PIXI.Sprite(resources.background.texture);
-                bgSprite.width = this.app.renderer.width;
-                bgSprite.height = this.app.renderer.height;
-                this.stage.addChild(bgSprite);
+                this.resources = resources;
+                // Create background sprite ONCE and add to app.stage (behind this.stage)
+                if (
+                    resources.background &&
+                    resources.background.texture
+                ) {
+                    this.bgSprite = new PIXI.Sprite(resources.background.texture);
+                    this.bgSprite.x = 0;
+                    this.bgSprite.y = 0;
+                    this.bgSprite.width = this.app.renderer.width;
+                    this.bgSprite.height = this.app.renderer.height;
+                    this.app.stage.addChildAt(this.bgSprite, 0);
+                }
                 this.renderUI();
             })
             .catch((error) => {
                 console.error("Failed to load assets:", error);
+                this.resources = null;
+                // fallback: solid color
+                this.bgSprite = new PIXI.Graphics();
+                this.bgSprite.beginFill(0x000000);
+                this.bgSprite.drawRect(0, 0, this.app.renderer.width, this.app.renderer.height);
+                this.bgSprite.endFill();
+                this.app.stage.addChildAt(this.bgSprite, 0);
+                this.renderUI();
             });
 
         EE.addListener("RESIZE", this.onResize);
@@ -76,7 +98,16 @@ export class PixiPinLogin extends React.Component {
         EE.emit("RESIZE", { w: width, h: height });
     };
 
-    onResize = (data) => {
+   onResize = (data) => {
+        this.app.renderer.resize(data.w, data.h);
+
+        // Resize background to fill window
+        if (this.bgSprite) {
+            this.bgSprite.width = data.w;
+            this.bgSprite.height = data.h;
+        }
+
+        // Scale and center UI stage as before
         const scale = Math.min(
             data.h / PAGE_SIZE_DEFAULT.height,
             data.w / PAGE_SIZE_DEFAULT.width
@@ -84,11 +115,13 @@ export class PixiPinLogin extends React.Component {
         this.stage.scale.set(scale);
         this.stage.x = (data.w - PAGE_SIZE_DEFAULT.width * scale) / 2;
         this.stage.y = (data.h - PAGE_SIZE_DEFAULT.height * scale) / 2;
+
         this.renderUI();
     };
-
     renderUI = () => {
         this.stage.removeChildren();
+    
+
         const headerContainer = new PIXI.Container();
         const pinDisplayContainer = new PIXI.Container();
         const keypadContainer = new PIXI.Container();
@@ -128,7 +161,7 @@ export class PixiPinLogin extends React.Component {
     renderHeader = (container) => {
         const style = new PIXI.TextStyle({
             fontFamily: "Arial",
-            fontSize: 80,
+            fontSize: 100,
             fill: [0x00ffff, 0x0000ff],
             stroke: 0xffffff,
             strokeThickness: 4,
@@ -180,95 +213,95 @@ export class PixiPinLogin extends React.Component {
         container.addChild(pinText);
     };
 
- renderKeypad = (container) => {
-    const buttonWidth = 200;
-    const buttonHeight = 100;
-    const buttonSpacing = 30;
-    const rows = [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["C", "0", "OK"],
-    ];
+    renderKeypad = (container) => {
+        const buttonWidth = 200;
+        const buttonHeight = 100;
+        const buttonSpacing = 30;
+        const rows = [
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+            ["C", "0", "OK"],
+        ];
 
-    const buttons = {};
+        const buttons = {};
 
-    rows.forEach((row, rowIndex) => {
-        row.forEach((digit, colIndex) => {
-            const btn = new PIXI.Graphics();
-            const gradientTexture = this.generateGradientTexture(
-                buttonWidth,
-                buttonHeight,
-                [0x0000ff, 0xff00ff],
-                [1, 1]
-            );
-            btn.beginTextureFill({ texture: gradientTexture });
-            btn.drawRoundedRect(
-                0,
-                0,
-                buttonWidth,
-                buttonHeight,
-                buttonHeight / 2
-            );
-            btn.endFill();
-            btn.x = colIndex * (buttonWidth + buttonSpacing);
-            btn.y = rowIndex * (buttonHeight + buttonSpacing);
-            btn.interactive = true;
-            btn.buttonMode = true;
-            btn.on("pointerdown", () => this.handlePinInput(digit));
-            container.addChild(btn);
-            buttons[digit] = btn;
+        rows.forEach((row, rowIndex) => {
+            row.forEach((digit, colIndex) => {
+                const btn = new PIXI.Graphics();
+                const gradientTexture = this.generateGradientTexture(
+                    buttonWidth,
+                    buttonHeight,
+                    [0x0000ff, 0xff00ff],
+                    [1, 1]
+                );
+                btn.beginTextureFill({ texture: gradientTexture });
+                btn.drawRoundedRect(
+                    0,
+                    0,
+                    buttonWidth,
+                    buttonHeight,
+                    buttonHeight / 2
+                );
+                btn.endFill();
+                btn.x = colIndex * (buttonWidth + buttonSpacing);
+                btn.y = rowIndex * (buttonHeight + buttonSpacing);
+                btn.interactive = true;
+                btn.buttonMode = true;
+                btn.on("pointerdown", () => this.handlePinInput(digit));
+                container.addChild(btn);
+                buttons[digit] = btn;
 
-            const txt = new PIXI.Text(digit, {
-                fontFamily: "Arial",
-                fontSize: 35,
-                fill: 0xffffff,
-                align: "center",
+                const txt = new PIXI.Text(digit, {
+                    fontFamily: "Arial",
+                    fontSize: 35,
+                    fill: 0xffffff,
+                    align: "center",
+                });
+                txt.anchor.set(0.5);
+                txt.x = btn.x + buttonWidth / 2;
+                txt.y = btn.y + buttonHeight / 2;
+                container.addChild(txt);
             });
-            txt.anchor.set(0.5);
-            txt.x = btn.x + buttonWidth / 2;
-            txt.y = btn.y + buttonHeight / 2;
-            container.addChild(txt);
         });
-    });
 
-    const cButton = buttons["C"];
-    const okButton = buttons["OK"];
+        const cButton = buttons["C"];
+        const okButton = buttons["OK"];
 
-    const cGradientTexture = this.generateGradientTexture(
-        buttonWidth,
-        buttonHeight,
-        [0xff00ff, 0xff00ff],
-        [1, 1]
-    );
-    cButton.clear();
-    cButton.beginTextureFill({ texture: cGradientTexture });
-    cButton.drawRoundedRect(
-        0,
-        0,
-        buttonWidth,
-        buttonHeight,
-        buttonHeight / 2
-    );
-    cButton.endFill();
+        const cGradientTexture = this.generateGradientTexture(
+            buttonWidth,
+            buttonHeight,
+            [0xff00ff, 0xff00ff],
+            [1, 1]
+        );
+        cButton.clear();
+        cButton.beginTextureFill({ texture: cGradientTexture });
+        cButton.drawRoundedRect(
+            0,
+            0,
+            buttonWidth,
+            buttonHeight,
+            buttonHeight / 2
+        );
+        cButton.endFill();
 
-    const okGradientTexture = this.generateGradientTexture(
-        buttonWidth,
-        buttonHeight,
-        [0x00ff00, 0x00ff00],
-        [1, 1]
-    );
-    okButton.clear();
-    okButton.beginTextureFill({ texture: okGradientTexture });
-    okButton.drawRoundedRect(
-        0,
-        0,
-        buttonWidth,
-        buttonHeight,
-        buttonHeight / 2
-    );
-    okButton.endFill();
-};
+        const okGradientTexture = this.generateGradientTexture(
+            buttonWidth,
+            buttonHeight,
+            [0x00ff00, 0x00ff00],
+            [1, 1]
+        );
+        okButton.clear();
+        okButton.beginTextureFill({ texture: okGradientTexture });
+        okButton.drawRoundedRect(
+            0,
+            0,
+            buttonWidth,
+            buttonHeight,
+            buttonHeight / 2
+        );
+        okButton.endFill();
+    };
 
     renderRememberPin = (container) => {
         const checkbox = new PIXI.Graphics();
@@ -351,7 +384,12 @@ export class PixiPinLogin extends React.Component {
             EE.emit("GO_GAME");
         } else {
             this.setState(
-                (prev) => ({ pinValue: prev.pinValue + digit }),
+                (prev) => ({
+                    pinValue:
+                        prev.pinValue.length >= 10
+                            ? prev.pinValue
+                            : prev.pinValue + digit,
+                }),
                 this.refreshPinDisplay
             );
         }
