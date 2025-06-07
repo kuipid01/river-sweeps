@@ -7,12 +7,12 @@ function Preloader() {
             <div className="prel-logo">
                 <img
                     className="prel-logo-img"
-                    src="images/frenzy/river.png"
+                    src="images/frenzy/lady_luck.png"
                     alt=""
                 />
             </div>
             <img
-                src="http://localhost:3000/images/frenzy/login/bg2.png"
+                src="/images/frenzy/login/bg2.png"
                 className="bg-load"
                 alt=""
             />

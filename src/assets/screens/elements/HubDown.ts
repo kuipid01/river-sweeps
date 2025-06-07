@@ -40,8 +40,8 @@ export class HubDown extends PIXI.Sprite {
         this.coin.y = data.h / data.scale - 187;
         this.wheel.y = data.h / data.scale - 155;
 
-        this.logo.x = data.w / data.scale / 2 - 325;
-        this.logo.y = data.h / data.scale - 270;
+        this.logo.x = data.w / data.scale / 2 - 265;
+        this.logo.y = data.h / data.scale - 260;
         this.logo.scale.set(0.95);
 
         this.dback.x = data.w / data.scale / 2 - 370;
