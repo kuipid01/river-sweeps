@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -54,63 +55,49 @@
         background-color: #000;
       }
       #root {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
+        width: 100%;
+        height: 100%;
       }
-      @media only screen and (max-device-width: 768px) {
-        @media (orientation: portrait), (max-aspect-ratio: 13/9) {
-          #root {
-            transform: rotate(-90deg);
-            transform-origin: left top;
-            width: 100vh;
-            height: 100vw;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            overflow: hidden;
-          }
-        }
-      }
+   
     </style>
     <script>
-      // Resize Pixi.js canvas based on orientation (assumes Pixi.js is used in React app)
+      // Lock screen to landscape on mobile devices
       window.addEventListener('load', () => {
-        // Function to resize Pixi.js canvas
-        function resizeCanvas() {
-          const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
-          if (!isMobile) return; // Skip for non-mobile devices
-
-          const isPortrait = window.innerHeight > window.innerWidth || window.matchMedia('(max-aspect-ratio: 13/9)').matches;
-          const width = isPortrait ? window.innerHeight : window.innerWidth;
-          const height = isPortrait ? window.innerWidth : window.innerHeight;
-
-          // Access Pixi.js app (assumes global or React ref; adjust as needed)
-          if (window.pixiApp && window.pixiApp.renderer) {
-            window.pixiApp.renderer.resize(width, height);
-            // Update stage scale or reposition elements if needed
-            if (window.pixiApp.stage) {
-              window.pixiApp.stage.scale.set(1); // Reset scale
-              // Example: Center stage content
-              window.pixiApp.stage.x = width / 2;
-              window.pixiApp.stage.y = height / 2;
+        // Check if device is mobile (max-device-width: 768px)
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          // Attempt to lock orientation to landscape
+          screen.orientation.lock('landscape').then(() => {
+            console.log('Orientation locked to landscape');
+          }).catch((err) => {
+            console.error('Failed to lock orientation:', err);
+            // Fallback: Fullscreen mode may help on some devices
+            if (jQuery.fn.fullscreen) {
+              jQuery('body').fullscreen();
             }
-            // Fix touch event misalignment
-            if (window.pixiApp.renderer.plugins.interaction) {
-              window.pixiApp.renderer.plugins.interaction.autoPreventDefault = false;
-            }
+          });
+        } else if (isMobile) {
+          // Fallback for browsers without orientation lock
+          console.warn('Screen orientation lock not supported');
+          if (jQuery.fn.fullscreen) {
+            jQuery('body').fullscreen();
           }
         }
+      });
 
-        // Initial resize
-        resizeCanvas();
-
-        // Listen for resize/orientation changes
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', resizeCanvas);
+      // Re-apply lock on orientation change
+      window.addEventListener('orientationchange', () => {
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch((err) => {
+            console.error('Failed to re-lock orientation:', err);
+          });
+        }
       });
     </script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
   </body>
-  <div id="root"></div>
 </html>
