@@ -60,7 +60,41 @@
       }
      
     </style>
- ch
+    <script>
+      // Lock screen to landscape on mobile devices
+      window.addEventListener('load', () => {
+        // Check if device is mobile (max-device-width: 768px)
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          // Attempt to lock orientation to landscape
+          screen.orientation.lock('landscape').then(() => {
+            console.log('Orientation locked to landscape');
+          }).catch((err) => {
+            console.error('Failed to lock orientation:', err);
+            // Fallback: Fullscreen mode may help on some devices
+            if (jQuery.fn.fullscreen) {
+              jQuery('body').fullscreen();
+            }
+          });
+        } else if (isMobile) {
+          // Fallback for browsers without orientation lock
+          console.warn('Screen orientation lock not supported');
+          if (jQuery.fn.fullscreen) {
+            jQuery('body').fullscreen();
+          }
+        }
+      });
+
+      // Re-apply lock on orientation change
+      window.addEventListener('orientationchange', () => {
+        const isMobile = window.matchMedia('(max-device-width: 768px)').matches;
+        if (isMobile && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch((err) => {
+            console.error('Failed to re-lock orientation:', err);
+          });
+        }
+      });
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
