@@ -4,20 +4,23 @@ import { Settings } from "./HubRight";
 import { HubCategory, CategoryConfig } from "./HubCategory"; // Adjust import path
 
 export class HubTop extends PIXI.Sprite {
-    cont: PIXI.Container; // Changed to Container
-    // back: TopBack;
+    cont: PIXI.Container;
     categoriesContainer: PIXI.Container;
+    private backgroundGraphics: PIXI.Graphics; // Changed to Graphics for color background
 
     constructor() {
         super();
 
-        // Initialize cont as a Container
         this.cont = this.addChild(new PIXI.Container());
-        // this.back = this.cont.addChild(new TopBack());
 
-        // Add container for categories
+        // --- Add Background Color ---
+        // Create a new Graphics object for the background color.
+        this.backgroundGraphics = new PIXI.Graphics();
+        this.cont.addChildAt(this.backgroundGraphics, 0); // Add it as the first child
+        // --- End Background Color ---
+
         this.categoriesContainer = this.cont.addChild(new PIXI.Container());
-        this.addCategories(); // Add category tiles
+        this.addCategories();
 
         this.onResize = this.onResize.bind(this);
 
@@ -27,21 +30,52 @@ export class HubTop extends PIXI.Sprite {
 
     private addCategories(): void {
         const categories: string[] = [
-            "ALL GAMES", "AMATIC", "FISHING", "TABLE GAMES", "NETENT", "EGT", "MAZD"
+            "ALL GAMES",
+            "AMATIC",
+            "FISHING",
+            "TABLE GAMES",
+            "NETENT",
+            "EGT",
+            "MAZD",
         ];
+
+        let currentX = 0;
+        const spacing = 50; // Adjust as needed
+
         categories.forEach((category, index) => {
             const config: CategoryConfig = { name: category, index };
             const categoryTile = new HubCategory(config);
+
+            categoryTile.x = currentX;
             this.categoriesContainer.addChild(categoryTile);
+
+            currentX += categoryTile.width + spacing;
         });
     }
 
     onResize(_data: any) {
+        // --- Resize Background Color ---
+        // Clear previous drawing, set fill color, and redraw the rectangle
+        this.backgroundGraphics.clear();
+        this.backgroundGraphics.beginFill(0x333333); // Example: Dark gray color (hexadecimal)
+        // You can change 0x333333 to any hexadecimal color code (e.g., 0xFF0000 for red)
+        this.backgroundGraphics.drawRect(
+            0,
+            0,
+            _data.w / _data.scale,
+            _data.h / _data.scale
+        );
+        this.backgroundGraphics.endFill();
+        // --- End Resize Background Color ---
+
         // Update categories container position and scale
-        this.categoriesContainer.x = 0; // Adjust based on layout
-        this.categoriesContainer.y = 120; // Position below upper panel (adjust as needed)
+        // Center the categories container horizontally
+        this.categoriesContainer.x =
+            _data.w / _data.scale / 2 - this.categoriesContainer.width / 2;
+        this.categoriesContainer.y = 10; // Position below upper panel (adjust as needed)
 
         // Existing resize logic
+        // If TopBack is re-integrated, ensure its onResize is called here.
         // this.back.onResize(_data); // Delegate to TopBack for its resize logic
     }
 }
@@ -119,7 +153,6 @@ class TopBack extends PIXI.Sprite {
     }
 }
 
-// Rest of your classes (Frame, UserBlock) remain unchanged
 export class Frame extends PIXI.Sprite {
     cont: PIXI.Sprite;
     animate: PIXI.AnimatedSprite;
@@ -128,7 +161,9 @@ export class Frame extends PIXI.Sprite {
         this.cont = this.addChild(new PIXI.Sprite());
         this.play = this.play.bind(this);
 
-        const json0 = PIXI.Loader.shared.resources["images/anim/frame_up.json"]?.spritesheet;
+        const json0 =
+            PIXI.Loader.shared.resources["images/anim/frame_up.json"]
+                ?.spritesheet;
         const array0: any[] = [];
         if (json0) {
             Object.keys(json0.textures)
