@@ -1,16 +1,23 @@
 import * as PIXI from "pixi.js";
 import { EE } from "../../../App";
 import { Settings } from "./HubRight";
+import { HubCategory, CategoryConfig } from "./HubCategory"; // Adjust import path
 
 export class HubTop extends PIXI.Sprite {
-    cont: PIXI.Sprite;
-    back: PIXI.Sprite = new PIXI.Sprite();
+    cont: PIXI.Container; // Changed to Container
+    // back: TopBack;
+    categoriesContainer: PIXI.Container;
 
     constructor() {
         super();
-        //
-        this.cont = this.addChild(new PIXI.Sprite());
-        this.back = this.cont.addChild(new TopBack());
+
+        // Initialize cont as a Container
+        this.cont = this.addChild(new PIXI.Container());
+        // this.back = this.cont.addChild(new TopBack());
+
+        // Add container for categories
+        this.categoriesContainer = this.cont.addChild(new PIXI.Container());
+        this.addCategories(); // Add category tiles
 
         this.onResize = this.onResize.bind(this);
 
@@ -18,11 +25,24 @@ export class HubTop extends PIXI.Sprite {
         EE.emit("FORCE_RESIZE");
     }
 
+    private addCategories(): void {
+        const categories: string[] = [
+            "ALL GAMES", "AMATIC", "FISHING", "TABLE GAMES", "NETENT", "EGT", "MAZD"
+        ];
+        categories.forEach((category, index) => {
+            const config: CategoryConfig = { name: category, index };
+            const categoryTile = new HubCategory(config);
+            this.categoriesContainer.addChild(categoryTile);
+        });
+    }
+
     onResize(_data: any) {
-        //const spaceX = (data.w/data.scale) - PAGE_SIZE_DEFAULT.width;
-        //this.back.width = (data.w/data.scale);
-        //this.frame_ex1.width = this.frame_ex2.width = spaceX/2;
-        //this.frame_ex2.x = (data.w/data.scale) - spaceX/2;
+        // Update categories container position and scale
+        this.categoriesContainer.x = 0; // Adjust based on layout
+        this.categoriesContainer.y = 120; // Position below upper panel (adjust as needed)
+
+        // Existing resize logic
+        // this.back.onResize(_data); // Delegate to TopBack for its resize logic
     }
 }
 
@@ -78,7 +98,6 @@ class TopBack extends PIXI.Sprite {
         this.settings.scale.set(0.7);
 
         this.onResize = this.onResize.bind(this);
-        //
         EE.addListener("RESIZE", this.onResize);
         EE.emit("FORCE_RESIZE");
     }
@@ -86,17 +105,11 @@ class TopBack extends PIXI.Sprite {
     onResize(_data: any) {
         this.grandJackpotText.x = _data.w / _data.scale / 2 - 220;
         this.grandJackpotText.y = 20;
-        this.grandJackpotText.scale = {
-            x: 0.7,
-            y: 0.7,
-        };
+        this.grandJackpotText.scale = { x: 0.7, y: 0.7 };
 
         this.jackpotPrice.x = _data.w / _data.scale / 2 - 300;
         this.jackpotPrice.y = 70;
-        this.jackpotPrice.scale = {
-            x: 0.8,
-            y: 0.8,
-        };
+        this.jackpotPrice.scale = { x: 0.8, y: 0.8 };
 
         this.upperPannel.width = _data.w / _data.scale;
         this.upperPannel.height = 170;
@@ -105,20 +118,18 @@ class TopBack extends PIXI.Sprite {
         this.settings.x = _data.w / _data.scale - 400;
     }
 }
+
+// Rest of your classes (Frame, UserBlock) remain unchanged
 export class Frame extends PIXI.Sprite {
     cont: PIXI.Sprite;
     animate: PIXI.AnimatedSprite;
     constructor() {
         super();
-        //
         this.cont = this.addChild(new PIXI.Sprite());
-        //
         this.play = this.play.bind(this);
-        //
-        const json0 =
-            PIXI.Loader.shared.resources["images/anim/frame_up.json"]
-                .spritesheet;
-        const array0: any = [];
+
+        const json0 = PIXI.Loader.shared.resources["images/anim/frame_up.json"]?.spritesheet;
+        const array0: any[] = [];
         if (json0) {
             Object.keys(json0.textures)
                 .sort()
@@ -142,6 +153,7 @@ export class Frame extends PIXI.Sprite {
 class UserBlock extends PIXI.Sprite {
     user: PIXI.Sprite;
     newsButton: PIXI.Sprite = new PIXI.Sprite();
+
     constructor() {
         super();
         const styletext = new PIXI.TextStyle({
@@ -193,7 +205,6 @@ class UserBlock extends PIXI.Sprite {
         coinValue.x = 350 - coinValue.width / 2;
         coinValue.y = 68;
 
-        //
         this.user.interactive = true;
         this.user.buttonMode = true;
 
@@ -201,14 +212,13 @@ class UserBlock extends PIXI.Sprite {
             EE.emit("SHOW_INFO");
         });
 
-        this.user.height = 492;
         this.user.height = 194;
 
         this.onResize = this.onResize.bind(this);
-        //
         EE.addListener("RESIZE", this.onResize);
         EE.emit("FORCE_RESIZE");
     }
+
     onResize(_data: any) {
         this.newsButton.x = 520;
         this.newsButton.y = 23;
