@@ -4,7 +4,6 @@ import { Settings } from "./HubRight";
 import { HubCategory, CategoryConfig } from "./HubCategory"; // Adjust import path
 import { games } from "./GamesCategories";
 
-
 export class HubTop extends PIXI.Sprite {
     private cont: PIXI.Container;
     private categoriesContainer: PIXI.Container;
@@ -59,20 +58,24 @@ export class HubTop extends PIXI.Sprite {
 
     private addCategories(): void {
         const itemSpacing = 260;
-        const itemWidth = 180;
+        const itemWidth = 250;
 
         games.forEach((game, index) => {
             const sprite = PIXI.Sprite.from(game.image);
             sprite.interactive = true;
             sprite.buttonMode = true;
 
-            sprite.x = index * itemSpacing;
+            sprite.x = game.name==="EGT" ? index * itemSpacing +  90 :  index * itemSpacing;
             sprite.y = 10;
-            sprite.width = itemWidth;
-            sprite.height = 120;
+            sprite.width = game.name === "EGT" ? 100 : itemWidth;
+            sprite.height = game.name === "EGT" ? 100 : 120;
 
             sprite.on("pointerdown", () => {
-                this.loadGameComponent(this.scrollContainer, game.component, this.app);
+                this.loadGameComponent(
+                    this.scrollContainer,
+                    game.component,
+                    this.app
+                );
             });
 
             this.scrollContainer.addChild(sprite);
@@ -86,7 +89,13 @@ export class HubTop extends PIXI.Sprite {
         // --- Background Bar ---
         this.backgroundGraphics.clear();
         this.backgroundGraphics.beginFill(0x060922);
-        this.backgroundGraphics.drawRoundedRect(0, 0, screenWidth, barHeight, 20);
+        this.backgroundGraphics.drawRoundedRect(
+            0,
+            0,
+            screenWidth,
+            barHeight,
+            20
+        );
         this.backgroundGraphics.endFill();
 
         // --- Neon Border ---
