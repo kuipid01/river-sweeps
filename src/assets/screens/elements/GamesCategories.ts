@@ -20,6 +20,24 @@ export const games = [
         component: (app: PIXI.Application, scrollContainer: PIXI.Container) =>
             new FishingGame(app, scrollContainer),
     },
+    {
+        name: "fISHING",
+        image: "/images/frenzy/games/FISH.png",
+        component: (app: PIXI.Application, scrollContainer: PIXI.Container) =>
+            new FishingGame(app, scrollContainer),
+    },
+    {
+        name: "EGT",
+        image: "/images/frenzy/games/egt.svg",
+        component: (app: PIXI.Application, scrollContainer: PIXI.Container) =>
+            new FishingGame(app, scrollContainer),
+    },
+    {
+        name: "TABLE GAMES",
+        image: "/images/frenzy/games/table-games.png",
+        component: (app: PIXI.Application, scrollContainer: PIXI.Container) =>
+            new FishingGame(app, scrollContainer),
+    },
     //   { name: 'Table', image: 'assets/table.png', component: () => new TableGame() },
     //   { name: 'NetEnt', image: 'assets/netent.png', component: () => new NetEntGame() },
     // ...add more
