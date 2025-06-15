@@ -2,81 +2,109 @@ import * as PIXI from "pixi.js";
 import { EE } from "../../../App";
 import { Settings } from "./HubRight";
 import { HubCategory, CategoryConfig } from "./HubCategory"; // Adjust import path
+import { games } from "./GamesCategories";
+
 
 export class HubTop extends PIXI.Sprite {
-    cont: PIXI.Container;
-    categoriesContainer: PIXI.Container;
-    private backgroundGraphics: PIXI.Graphics; // Changed to Graphics for color background
+    private cont: PIXI.Container;
+    private categoriesContainer: PIXI.Container;
+    private backgroundGraphics: PIXI.Graphics;
+    private currentGameContainer: PIXI.Container | null = null;
+    private scrollContainer: PIXI.Container;
+    private bar: PIXI.Graphics;
+    private app: PIXI.Application;
 
-    constructor() {
+    constructor(app: PIXI.Application) {
         super();
+        this.app = app;
 
         this.cont = this.addChild(new PIXI.Container());
 
-        // --- Add Background Color ---
-        // Create a new Graphics object for the background color.
         this.backgroundGraphics = new PIXI.Graphics();
-        this.cont.addChildAt(this.backgroundGraphics, 0); // Add it as the first child
-        // --- End Background Color ---
+        this.bar = new PIXI.Graphics();
+        this.categoriesContainer = new PIXI.Container();
+        this.scrollContainer = new PIXI.Container();
 
-        this.categoriesContainer = this.cont.addChild(new PIXI.Container());
+        this.cont.addChild(this.backgroundGraphics);
+        this.cont.addChild(this.bar);
+        this.cont.addChild(this.categoriesContainer);
+
+        this.categoriesContainer.addChild(this.scrollContainer);
+
         this.addCategories();
 
         this.onResize = this.onResize.bind(this);
-
         EE.addListener("RESIZE", this.onResize);
         EE.emit("FORCE_RESIZE");
     }
 
+    private loadGameComponent(
+        scrollContainer: PIXI.Container,
+        componentFactory: (
+            app: PIXI.Application,
+            scrollContainer: PIXI.Container
+        ) => PIXI.Container,
+        app: PIXI.Application
+    ) {
+        if (this.currentGameContainer) {
+            app.stage.removeChild(this.currentGameContainer);
+            this.currentGameContainer.destroy({ children: true });
+        }
+
+        scrollContainer.visible = false;
+
+        this.currentGameContainer = componentFactory(app, scrollContainer);
+        app.stage.addChild(this.currentGameContainer);
+    }
+
     private addCategories(): void {
-        const categories: string[] = [
-            "ALL GAMES",
-            "AMATIC",
-            "FISHING",
-            "TABLE GAMES",
-            "NETENT",
-            "EGT",
-            "MAZD",
-        ];
+        const itemSpacing = 260;
+        const itemWidth = 180;
 
-        let currentX = 0;
-        const spacing = 50; // Adjust as needed
+        games.forEach((game, index) => {
+            const sprite = PIXI.Sprite.from(game.image);
+            sprite.interactive = true;
+            sprite.buttonMode = true;
 
-        categories.forEach((category, index) => {
-            const config: CategoryConfig = { name: category, index };
-            const categoryTile = new HubCategory(config);
+            sprite.x = index * itemSpacing;
+            sprite.y = 10;
+            sprite.width = itemWidth;
+            sprite.height = 120;
 
-            categoryTile.x = currentX;
-            this.categoriesContainer.addChild(categoryTile);
+            sprite.on("pointerdown", () => {
+                this.loadGameComponent(this.scrollContainer, game.component, this.app);
+            });
 
-            currentX += categoryTile.width + spacing;
+            this.scrollContainer.addChild(sprite);
         });
     }
 
     onResize(_data: any) {
-        // --- Resize Background Color ---
-        // Clear previous drawing, set fill color, and redraw the rectangle
+        const screenWidth = _data.w / _data.scale;
+        const barHeight = 150;
+
+        // --- Background Bar ---
         this.backgroundGraphics.clear();
-        this.backgroundGraphics.beginFill(0x333333); // Example: Dark gray color (hexadecimal)
-        // You can change 0x333333 to any hexadecimal color code (e.g., 0xFF0000 for red)
-        this.backgroundGraphics.drawRect(
-            0,
-            0,
-            _data.w / _data.scale,
-            _data.h / _data.scale
-        );
+        this.backgroundGraphics.beginFill(0x060922);
+        this.backgroundGraphics.drawRoundedRect(0, 0, screenWidth, barHeight, 20);
         this.backgroundGraphics.endFill();
-        // --- End Resize Background Color ---
 
-        // Update categories container position and scale
-        // Center the categories container horizontally
-        this.categoriesContainer.x =
-            _data.w / _data.scale / 2 - this.categoriesContainer.width / 2;
-        this.categoriesContainer.y = 10; // Position below upper panel (adjust as needed)
+        // --- Neon Border ---
+        this.bar.clear();
+        this.bar.lineStyle(4, 0xff00ff, 1);
+        this.bar.drawRoundedRect(0, 0, screenWidth, barHeight, 20);
 
-        // Existing resize logic
-        // If TopBack is re-integrated, ensure its onResize is called here.
-        // this.back.onResize(_data); // Delegate to TopBack for its resize logic
+        // --- Categories Centering or Scroll Logic ---
+        const itemSpacing = 260;
+        const totalWidth = games.length * itemSpacing;
+
+        if (totalWidth < screenWidth) {
+            this.scrollContainer.x = (screenWidth - totalWidth) / 2;
+        } else {
+            this.scrollContainer.x = 20; // default left padding
+        }
+
+        this.categoriesContainer.y = 10;
     }
 }
 

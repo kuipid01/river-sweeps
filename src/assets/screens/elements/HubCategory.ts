@@ -11,10 +11,10 @@ export class HubCategory extends PIXI.Container {
         super();
 
         // Background image
-        const bg = new PIXI.Sprite(PIXI.Texture.from('images/frenzy/category_bg.png'));
-        bg.width = 150;
-        bg.height = 100;
-        this.addChild(bg);
+        // const bg = new PIXI.Sprite(PIXI.Texture.from('images/frenzy/category_bg.png'));
+        // bg.width = 150;
+        // bg.height = 100;
+        // this.addChild(bg);
 
         // Text style for the category label
         const categoryTextStyle = new PIXI.TextStyle({
@@ -34,18 +34,21 @@ export class HubCategory extends PIXI.Container {
         // Category name
         const title = new PIXI.Text(config.name, categoryTextStyle);
         title.anchor.set(0.5);
-        title.x = bg.width / 2;
-        title.y = bg.height / 2;
+        // title.x = bg.width / 2;
+        // title.y = bg.height / 2;
+        title.x = 100
+        title.y = 10
         this.addChild(title);
 
         // Icon below the text
-        const icon = new PIXI.Sprite(PIXI.Texture.from('images/frenzy/category_icon.png'));
-        icon.x = bg.width / 2 - icon.width / 2;
-        icon.y = bg.height - icon.height - 10;
-        this.addChild(icon);
+        // const icon = new PIXI.Sprite(PIXI.Texture.from('images/frenzy/category_icon.png'));
+        // icon.x = bg.width / 2 - icon.width / 2;
+        // icon.y = bg.height - icon.height - 10;
+        // this.addChild(icon);
 
         // Positioning (may be overridden by parent)
-        this.x = config.index * (bg.width + 10);
+        this.x = config.index +10;
+        // this.x = config.index * (bg.width + 10);
         this.y = 20;
 
         // Interactivity
