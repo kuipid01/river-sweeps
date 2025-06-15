@@ -12,11 +12,14 @@ export class HubTop extends PIXI.Sprite {
     private scrollContainer: PIXI.Container;
     private bar: PIXI.Graphics;
     private app: PIXI.Application;
-
-    constructor(app: PIXI.Application) {
+    private onGameSelected: (component: PIXI.Container) => void;
+    constructor(
+        app: PIXI.Application,
+        onGameSelected: (component: PIXI.Container) => void
+    ) {
         super();
         this.app = app;
-
+        this.onGameSelected = onGameSelected;
         this.cont = this.addChild(new PIXI.Container());
 
         this.backgroundGraphics = new PIXI.Graphics();
@@ -65,17 +68,28 @@ export class HubTop extends PIXI.Sprite {
             sprite.interactive = true;
             sprite.buttonMode = true;
 
-            sprite.x = game.name==="EGT" ? index * itemSpacing +  90 :  index * itemSpacing;
+            sprite.x =
+                game.name === "EGT"
+                    ? index * itemSpacing + 90
+                    : index * itemSpacing;
             sprite.y = 10;
             sprite.width = game.name === "EGT" ? 100 : itemWidth;
             sprite.height = game.name === "EGT" ? 100 : 120;
 
+            // sprite.on("pointerdown", () => {
+            //     this.loadGameComponent(
+            //         this.scrollContainer,
+            //         game.component,
+            //         this.app
+            //     );
+            // });
+
             sprite.on("pointerdown", () => {
-                this.loadGameComponent(
-                    this.scrollContainer,
-                    game.component,
-                    this.app
+                const component = game.component(
+                    this.app,
+                    this.scrollContainer
                 );
+                this.onGameSelected(component);
             });
 
             this.scrollContainer.addChild(sprite);
