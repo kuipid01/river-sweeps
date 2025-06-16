@@ -26,8 +26,8 @@ export class Hub extends PIXI.Sprite {
 
         this.cont.addChild(this.hubTop);
 
-        this.down = new HubDown();
-        this.cont.addChild(this.down);
+        // this.down = new HubDown();
+        // this.cont.addChild(this.down);
         // Add category tiles to HubTop (adjust if categories belong elsewhere)
         // const categories = ["ALL GAMES", "AMATIC", "FISHING", "TABLE GAMES", "NETENT", "EGT", "MAZD"];
         // categories.forEach((category, index) => {

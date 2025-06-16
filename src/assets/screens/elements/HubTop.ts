@@ -70,7 +70,7 @@ export class HubTop extends PIXI.Sprite {
 
             sprite.x =
                 game.name === "EGT"
-                    ? index * itemSpacing + 90
+                    ? index  * itemSpacing + 90
                     : index * itemSpacing;
             sprite.y = 10;
             sprite.width = game.name === "EGT" ? 100 : itemWidth;

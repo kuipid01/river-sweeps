@@ -76,9 +76,9 @@ export async function setup() {
 
 function createHub() {
     maincontainer.addChild(new Hub());
-    const games = maincontainer.addChild(new HubIcons3());
-    games.x = 0;
-    games.y = 220;
+    // const games = maincontainer.addChild(new HubIcons3());
+    // games.x = 0;
+    // games.y = 220;
     //maincontainer.addChild(new HubRight());
 }
 
