@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 import { gsap } from "gsap";
 import PixiPlugin from "gsap/src/PixiPlugin";
 import { Hub } from "./assets/screens/Hub";
-import { HubIcons3 } from "./assets/screens/HubIcons3";
+// import { HubIcons3 } from "./assets/screens/HubIcons3";
 import { EE } from "./App";
 //import {HubRight} from "./assets/screens/elements/HubRight";
 import { BonusWheel } from "./assets/bonus/BonusWheel";

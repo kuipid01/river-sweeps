@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
-import { HubDown } from "./elements/HubDown";
+// import { HubDown } from "./elements/HubDown";
 import { HubTop } from "./elements/HubTop";
-import { HubCategory } from "./elements/HubCategory";
+// import { HubCategory } from "./elements/HubCategory";
 
 export class Hub extends PIXI.Sprite {
     cont: PIXI.Sprite = new PIXI.Sprite();
